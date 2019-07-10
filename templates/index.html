@@ -1,0 +1,150 @@
+<head>
+  <!-- Plotly.js -->
+
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+  <div id="myDiv">
+    <!-- Plotly chart will be drawn inside this DIV -->
+  </div>
+  <div id="bubble">
+
+  </div>
+  <div id="table">
+
+  </div>
+  <div id="table2">
+
+  </div>
+  <div id="bar">
+
+  </div>
+  <script>
+
+    d3.json('/plots').then(function (d) {
+      var trace1 = {
+        x: d.age, y: d.bmi, z: d.charges,
+        mode: 'markers',
+        marker: {
+          size: 4,
+          line: {
+            color: 'rgba(217, 217, 217, 0.14)',
+            width: 0.5
+          },
+          opacity: 0.8
+        },
+        type: 'scatter3d'
+      };
+
+      var data = [trace1];
+      var layout = {
+        margin: {
+          l: 0,
+          r: 0,
+          b: 0,
+          t: 0
+        },
+        scene: {
+          xaxis: { title: "Age (Years)" },
+          yaxis: { title: "Body Mass Index" },
+          zaxis: { title: "Charges (USD)" }
+        }
+      };
+      Plotly.plot('myDiv', data, layout);
+      var bubble = {
+        margin: { t: 0 },
+        xaxis: { title: "age" },
+        yaxis: { title: "B.M.I." },
+        hovermode: "closest"
+      };
+      var bubbleData = [{
+        x: d.age,
+        y: d.bmi,
+        text: d.charges,
+        mode: "markers",
+        marker: {
+          size: d.charges.map(function (x) { return x / 1000; }),
+          color: d.smokes,
+          colorscale: [[0,'rgb(0,0,200)'],[1,'rgb(200,0,0)']]
+        }
+      }
+      ];
+
+      Plotly.plot("bubble", bubbleData, bubble);
+      var tablevalues = [
+        ['Male Average Charges', 'Female Average Charges'],
+        [d.maleavg, d.femaleavg]]
+
+      var tabledata = [{
+        type: 'table',
+        header: {
+          values: [["Sex"], ["<b>Average Charges"]],
+          align: "center",
+          line: { width: 1, color: 'black' },
+          fill: { color: "grey" },
+          font: { family: "Arial", size: 12, color: "white" }
+        },
+        cells: {
+          values: tablevalues,
+          align: "center",
+          line: { color: "black", width: 1 },
+          font: { family: "Arial", size: 11, color: ["black"] }
+        }
+      }]
+
+      Plotly.plot('table', tabledata);
+      var tablevalues2 = [
+        ['Smoker Average Charges', 'Nonsmoker Average Charges'],
+        [d.smokeavg, d.nonsmokeavg]]
+
+      var tabledata2 = [{
+        type: 'table',
+        header: {
+          values: [["Smoker"], ["Average Charges"]],
+          align: "center",
+          line: { width: 1, color: 'black' },
+          fill: { color: "grey" },
+          font: { family: "Arial", size: 12, color: "white" }
+        },
+        cells: {
+          values: tablevalues2,
+          align: "center",
+          line: { color: "black", width: 1 },
+          font: { family: "Arial", size: 11, color: ["black"] }
+        }
+      }]
+
+      Plotly.plot('table2', tabledata2);
+      var data3 = [
+        {
+          x: ['Smoker', 'Nonsmoker'],
+          y: [d.smokeavg, d.nonsmokeavg],
+          type: 'bar',
+          marker: {
+            color: ['rgba(204,1,1,1)', 'rgba(1,1,204,1)']
+          },
+        }
+      ];
+      var barlayout = {
+        title: "Smoker vs Nonsmoker Average Insurance Charges",
+        yaxis: { title: "Average Charges (USD)" }
+      }
+
+      Plotly.newPlot('bar', data3, barlayout);
+
+
+
+    })
+
+  // console.log(data)
+
+  // d3.json('/plots').then(function(data) {
+  //     var layout = { margin: { t: 0 } }
+  //     var BAR = document.getElementById('bar');
+  //     Plotly.plot(BAR, data)
+  //   })
+
+  </script>
+</body>
